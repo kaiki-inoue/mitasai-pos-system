@@ -1,0 +1,31 @@
+@import 'tailwindcss';
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family:
+    'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic', system-ui, -apple-system,
+    sans-serif;
+  background-color: #f7f7f8;
+  color: #1f2328;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 数値入力のスピンボタンを非表示（タップ操作を優先するUIのため） */
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type='number'] {
+  appearance: textfield;
+}
