@@ -28,27 +28,28 @@ export function DashboardHeader({
 
   return (
     <header className="sticky top-0 z-40 border-b border-neutral-200 bg-white/90 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
-        <div className="flex items-center gap-3">
+      <div className="mx-auto grid max-w-6xl grid-cols-[1fr_auto] items-center gap-2 px-4 py-3 min-[743px]:flex min-[743px]:flex-wrap min-[743px]:justify-between min-[743px]:gap-3">
+        <div className="col-start-1 row-start-1 flex min-w-0 items-center gap-1.5 sm:gap-3">
           <Link
             to="/"
-            className="flex h-9 w-9 items-center justify-center rounded-lg border border-neutral-200 text-neutral-500 hover:bg-neutral-100"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-neutral-200 text-neutral-500 hover:bg-neutral-100 sm:h-9 sm:w-9"
           >
             <HomeOutlined />
           </Link>
-          <div className="flex items-center gap-2">
-            <p className="text-base font-semibold text-neutral-900">
+          <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
+            <p className="min-w-0 truncate text-sm font-semibold text-neutral-900 sm:text-base">
               {yearName}
             </p>
             {env === "demo" && (
-              <span className="inline-flex h-6 items-center rounded bg-neutral-200 px-1.5 text-xs font-medium text-neutral-700">
-                デモ環境
+              <span className="inline-flex h-6 shrink-0 items-center rounded bg-neutral-200 px-1.5 text-xs font-medium text-neutral-700">
+                <span className="sm:hidden">デモ</span>
+                <span className="hidden sm:inline">デモ環境</span>
               </span>
             )}
           </div>
         </div>
 
-        <nav className="flex gap-1 rounded-full bg-neutral-100 p-1">
+        <nav className="col-span-2 col-start-1 row-start-2 flex justify-self-center gap-1 rounded-full bg-neutral-100 p-1">
           {TABS.map((t) => (
             <button
               key={t.key}
@@ -64,13 +65,15 @@ export function DashboardHeader({
           ))}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="col-start-2 row-start-1 flex shrink-0 items-center gap-1.5 sm:gap-2">
           <StaffSelector staffList={staffList} />
           <button
             onClick={logout}
-            className="flex items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-600 hover:bg-neutral-100"
+            aria-label="ログアウト"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-100 sm:h-auto sm:w-auto sm:gap-1.5 sm:px-3 sm:py-2 sm:text-sm"
           >
-            <LogoutOutlined /> ログアウト
+            <LogoutOutlined />
+            <span className="hidden sm:inline">ログアウト</span>
           </button>
         </div>
       </div>

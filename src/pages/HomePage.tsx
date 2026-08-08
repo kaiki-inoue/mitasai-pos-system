@@ -21,22 +21,25 @@ export function HomePage() {
   return (
     <div className="min-h-screen bg-neutral-50 px-4 py-10">
       <div className="mx-auto max-w-3xl">
-        <div className="mb-8 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-semibold text-neutral-900">
+        <div className="mb-8 flex items-center justify-between gap-2">
+          <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
+            <h1 className="min-w-0 flex-1 truncate text-lg font-semibold text-neutral-900 sm:text-2xl">
               文化祭受付システム
             </h1>
             {env === "demo" && (
-              <span className="inline-flex h-7 items-center rounded-md bg-neutral-200 px-2.5 text-sm font-medium text-neutral-700">
-                デモ環境
+              <span className="inline-flex h-6 shrink-0 items-center rounded-md bg-neutral-200 px-1.5 text-xs font-medium text-neutral-700 sm:h-7 sm:px-2.5 sm:text-sm">
+                <span className="sm:hidden">デモ</span>
+                <span className="hidden sm:inline">デモ環境</span>
               </span>
             )}
           </div>
           <button
             onClick={logout}
-            className="flex items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-600 hover:bg-neutral-100"
+            aria-label="ログアウト"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-100 sm:h-auto sm:w-auto sm:gap-1.5 sm:px-3 sm:py-2 sm:text-sm"
           >
-            <LogoutOutlined /> ログアウト
+            <LogoutOutlined />
+            <span className="hidden sm:inline">ログアウト</span>
           </button>
         </div>
 

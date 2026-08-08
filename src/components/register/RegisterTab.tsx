@@ -186,8 +186,10 @@ export function RegisterTab({
     // 各ラッパーはモバイルでは display:contents で外し、order で縦積み順を制御する
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:items-start">
       <div className="contents lg:col-span-2 lg:block">
-        {/* 上段: 数量入力（高さ固定せず項目数に応じて伸縮） */}
-        <div className="contents lg:grid lg:grid-cols-2 lg:gap-4">
+        {/* 上段: 数量入力（高さ固定せず項目数に応じて伸縮）。
+            743px以上（タブレット・PC）で2列化し、外側ラッパーがcontentsのままの
+            743〜1024px（タブレット）でも正しい位置に並ぶようorder-2を付与する */}
+        <div className="order-2 contents min-[743px]:grid min-[743px]:grid-cols-2 min-[743px]:gap-4">
           <section className="order-2">
             <div className="space-y-2">
               {feeItems.map((item) => (

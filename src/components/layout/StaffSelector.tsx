@@ -36,16 +36,23 @@ export function StaffSelector({ staffList }: { staffList: StaffMember[] }) {
   }
 
   return (
-    <div ref={containerRef} className="relative">
+    <div ref={containerRef} className="relative shrink-0">
       <button
         onClick={() => setOpen((prev) => !prev)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className="flex h-9 items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-2.5 text-sm text-neutral-700 hover:bg-neutral-100"
+        aria-label={selected ? undefined : '担当者を選択'}
+        className="flex h-8 items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-2 text-sm text-neutral-700 hover:bg-neutral-100 sm:h-9 sm:px-2.5"
       >
-        <UserOutlined className="text-neutral-400" />
-        <span className={selected ? '' : 'text-neutral-400'}>{selected ? selected.name : '担当者を選択'}</span>
-        <DownOutlined className={`text-[10px] text-neutral-400 transition ${open ? 'rotate-180' : ''}`} />
+        <UserOutlined className="shrink-0 text-neutral-400" />
+        {selected ? (
+          <span className="max-w-20 truncate sm:max-w-none">{selected.name}</span>
+        ) : (
+          <span className="hidden text-neutral-400 sm:inline">担当者を選択</span>
+        )}
+        <DownOutlined
+          className={`!hidden text-[10px] text-neutral-400 transition sm:!inline-block ${open ? 'rotate-180' : ''}`}
+        />
       </button>
 
       {open && (
