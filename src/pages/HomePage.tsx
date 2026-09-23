@@ -28,8 +28,7 @@ export function HomePage() {
             </h1>
             {env === "demo" && (
               <span className="inline-flex h-6 shrink-0 items-center rounded-md bg-neutral-200 px-1.5 text-xs font-medium text-neutral-700 sm:h-7 sm:px-2.5 sm:text-sm">
-                <span className="sm:hidden">デモ</span>
-                <span className="hidden sm:inline">デモ環境</span>
+                デモ環境
               </span>
             )}
           </div>

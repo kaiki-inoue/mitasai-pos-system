@@ -42,8 +42,7 @@ export function DashboardHeader({
             </p>
             {env === "demo" && (
               <span className="inline-flex h-6 shrink-0 items-center rounded bg-neutral-200 px-1.5 text-xs font-medium text-neutral-700">
-                <span className="sm:hidden">デモ</span>
-                <span className="hidden sm:inline">デモ環境</span>
+                デモ環境
               </span>
             )}
           </div>
