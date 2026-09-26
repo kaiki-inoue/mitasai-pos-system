@@ -136,7 +136,7 @@ function NewYearModal({
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="例：三田祭2026"
+            placeholder="例：○○祭2026"
             className="w-full rounded-lg border border-neutral-300 px-3 py-2 placeholder:text-neutral-400 focus:border-neutral-900 focus:outline-none"
           />
         </label>
