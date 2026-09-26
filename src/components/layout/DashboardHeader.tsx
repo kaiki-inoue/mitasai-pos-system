@@ -28,7 +28,7 @@ export function DashboardHeader({
 
   return (
     <header className="sticky top-0 z-40 border-b border-neutral-200 bg-white/90 backdrop-blur">
-      <div className="mx-auto grid max-w-6xl grid-cols-[1fr_auto] items-center gap-2 px-4 py-3 min-[743px]:flex min-[743px]:flex-wrap min-[743px]:justify-between min-[743px]:gap-3">
+      <div className="mx-auto grid max-w-6xl grid-cols-[1fr_auto] items-center gap-2 px-4 py-3 min-[814px]:flex min-[814px]:flex-wrap min-[814px]:justify-between min-[814px]:gap-3">
         <div className="col-start-1 row-start-1 flex min-w-0 items-center gap-1.5 sm:gap-3">
           <Link
             to="/"
