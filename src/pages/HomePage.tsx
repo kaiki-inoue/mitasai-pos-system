@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import {
   PlusOutlined,
   CalendarOutlined,
+  DownloadOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
 import { useAuth } from "@/context/AuthContext";
@@ -32,14 +33,25 @@ export function HomePage() {
               </span>
             )}
           </div>
-          <button
-            onClick={logout}
-            aria-label="ログアウト"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-100 sm:h-auto sm:w-auto sm:gap-1.5 sm:px-3 sm:py-2 sm:text-sm"
-          >
-            <LogoutOutlined />
-            <span className="hidden sm:inline">ログアウト</span>
-          </button>
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+            <a
+              href="/manual.pdf"
+              download="文化祭受付システムマニュアル.pdf"
+              aria-label="マニュアルをダウンロード"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-100 sm:h-auto sm:w-auto sm:gap-1.5 sm:px-3 sm:py-2 sm:text-sm"
+            >
+              <DownloadOutlined />
+              <span className="hidden sm:inline">マニュアル</span>
+            </a>
+            <button
+              onClick={logout}
+              aria-label="ログアウト"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-100 sm:h-auto sm:w-auto sm:gap-1.5 sm:px-3 sm:py-2 sm:text-sm"
+            >
+              <LogoutOutlined />
+              <span className="hidden sm:inline">ログアウト</span>
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
