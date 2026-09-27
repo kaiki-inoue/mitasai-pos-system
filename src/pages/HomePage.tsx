@@ -36,7 +36,7 @@ export function HomePage() {
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             <a
               href="/manual.pdf"
-              download="文化祭受付システムマニュアル.pdf"
+              download="文化祭受付システム操作マニュアル.pdf"
               aria-label="マニュアルをダウンロード"
               className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-100 sm:h-auto sm:w-auto sm:gap-1.5 sm:px-3 sm:py-2 sm:text-sm"
             >
