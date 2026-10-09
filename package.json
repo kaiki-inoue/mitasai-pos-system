@@ -13,6 +13,7 @@
     "@ant-design/icons": "^6.3.2",
     "@tailwindcss/vite": "^4.3.2",
     "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "dayjs": "^1.11.21",
     "firebase": "^12.16.0",
     "firebase-admin": "^13.10.0",

@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { PinGate } from "@/components/home/PinGate";
 import { HomePage } from "@/pages/HomePage";
@@ -35,10 +36,18 @@ function RouteAnalytics() {
   return <Analytics route={route} path={pathname} />;
 }
 
+function RouteSpeedInsights() {
+  const { pathname } = useLocation();
+  const route = pathname === "/" ? "/" : "/:yearId";
+
+  return <SpeedInsights route={route} />;
+}
+
 function App() {
   return (
     <BrowserRouter>
       <RouteAnalytics />
+      <RouteSpeedInsights />
       <AuthProvider>
         <AppRoutes />
       </AuthProvider>
