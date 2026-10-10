@@ -18,11 +18,15 @@ export function DashboardHeader({
   tab,
   onTabChange,
   staffList,
+  staffListReady,
+  staffListError,
 }: {
   yearName: string;
   tab: DashboardTabKey;
   onTabChange: (tab: DashboardTabKey) => void;
   staffList: StaffMember[];
+  staffListReady: boolean;
+  staffListError: boolean;
 }) {
   const { logout, env } = useAuth();
 
@@ -65,7 +69,11 @@ export function DashboardHeader({
         </nav>
 
         <div className="col-start-2 row-start-1 flex shrink-0 items-center gap-1.5 sm:gap-2">
-          <StaffSelector staffList={staffList} />
+          <StaffSelector
+            staffList={staffList}
+            staffListReady={staffListReady}
+            staffListError={staffListError}
+          />
           <button
             onClick={logout}
             aria-label="ログアウト"

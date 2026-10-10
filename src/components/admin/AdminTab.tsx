@@ -39,6 +39,8 @@ interface Props {
   groupItems: GroupFeeItem[];
   products: Product[];
   staffList: StaffMember[];
+  staff: StaffMember | null;
+  staffListReady: boolean;
   section: AdminSectionKey;
   onSectionChange: (section: AdminSectionKey) => void;
   onEditTransaction: (t: Transaction) => void;
@@ -51,6 +53,8 @@ export function AdminTab({
   groupItems,
   products,
   staffList,
+  staff,
+  staffListReady,
   section,
   onSectionChange,
   onEditTransaction,
@@ -100,7 +104,14 @@ export function AdminTab({
           settings={year.settings}
         />
       )}
-      {section === "register" && <RegisterSessionPanel env={env} year={year} />}
+      {section === "register" && (
+        <RegisterSessionPanel
+          env={env}
+          year={year}
+          staff={staff}
+          staffListReady={staffListReady}
+        />
+      )}
       {section === "staff" && (
         <StaffSettings env={env} yearId={year.id} staffList={staffList} />
       )}

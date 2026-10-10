@@ -1,8 +1,16 @@
 // 金額計算タブ：入場料・グループ料金・物販の入力と確定
-import { useEffect, useMemo, useState } from 'react'
-import { TagOutlined } from '@ant-design/icons'
-import { useAuth } from '@/context/AuthContext'
-import type { EnvName, FeeItem, GroupFeeItem, Product, Ticket, Transaction, YearSettings } from '@/types'
+import { useEffect, useMemo, useState } from "react";
+import { TagOutlined } from "@ant-design/icons";
+import type {
+  EnvName,
+  FeeItem,
+  GroupFeeItem,
+  Product,
+  StaffMember,
+  Ticket,
+  Transaction,
+  YearSettings,
+} from "@/types";
 import {
   buildFeeLines,
   buildGroupLines,
@@ -10,43 +18,50 @@ import {
   calcEntryCount,
   calcFeeTotal,
   calcProductTotal,
-} from '@/utils/calcFee'
-import { generateSerial } from '@/utils/id'
-import { formatYen } from '@/utils/format'
+} from "@/utils/calcFee";
+import { generateSerial } from "@/utils/id";
+import { formatYen } from "@/utils/format";
 import {
   confirmTransaction,
   deleteTicket,
   deleteTransaction,
   issueTicket,
   updateTransaction,
-} from '@/lib/dataApi'
-import { CounterInput } from './CounterInput'
-import { TicketModal } from './TicketModal'
-import { TicketList } from './TicketList'
-import { RecentHistoryList } from './RecentHistoryList'
-import { ConfirmDeleteModal } from '@/components/common/ConfirmDeleteModal'
+} from "@/lib/dataApi";
+import { CounterInput } from "./CounterInput";
+import { TicketModal } from "./TicketModal";
+import { TicketList } from "./TicketList";
+import { RecentHistoryList } from "./RecentHistoryList";
+import { ConfirmDeleteModal } from "@/components/common/ConfirmDeleteModal";
 
-type Mode = { type: 'new' } | { type: 'ticket'; ticketId: string } | { type: 'edit'; transactionId: string }
+type Mode =
+  | { type: "new" }
+  | { type: "ticket"; ticketId: string }
+  | { type: "edit"; transactionId: string };
 
 interface Props {
-  env: EnvName
-  yearId: string
-  feeItems: FeeItem[]
-  products: Product[]
-  groupItems: GroupFeeItem[]
-  settings: YearSettings
-  recentTransactions: Transaction[]
-  pendingTickets: Ticket[]
+  env: EnvName;
+  yearId: string;
+  staff: StaffMember | null;
+  staffListReady: boolean;
+  feeItems: FeeItem[];
+  products: Product[];
+  groupItems: GroupFeeItem[];
+  settings: YearSettings;
+  recentTransactions: Transaction[];
+  pendingTickets: Ticket[];
   /** 履歴一覧（設定タブ）から編集要求された取引。消費後は onExternalEditConsumed で親側をリセットする */
-  externalEditTarget?: Transaction | null
-  onExternalEditConsumed?: () => void
+  externalEditTarget?: Transaction | null;
+  onExternalEditConsumed?: () => void;
   /** 「履歴一覧」ボタン押下時（設定タブの履歴一覧セクションへ遷移する） */
-  onViewFullHistory: () => void
+  onViewFullHistory: () => void;
 }
 
 export function RegisterTab({
   env,
   yearId,
+  staff,
+  staffListReady,
   feeItems,
   products,
   groupItems,
@@ -56,129 +71,167 @@ export function RegisterTab({
   onExternalEditConsumed,
   onViewFullHistory,
 }: Props) {
-  const { staff } = useAuth()
-  const [feeCounts, setFeeCounts] = useState<Record<string, number>>({})
-  const [groupCounts, setGroupCounts] = useState<Record<string, number>>({})
-  const [productCounts, setProductCounts] = useState<Record<string, number>>({})
-  const [feeWaived, setFeeWaived] = useState(false)
-  const [note, setNote] = useState('')
-  const [mode, setMode] = useState<Mode>({ type: 'new' })
-  const [ticketSerial, setTicketSerial] = useState<string | null>(null)
-  const [deleteTicketTarget, setDeleteTicketTarget] = useState<Ticket | null>(null)
-  const [deleteTransactionTarget, setDeleteTransactionTarget] = useState<Transaction | null>(null)
+  const [feeCounts, setFeeCounts] = useState<Record<string, number>>({});
+  const [groupCounts, setGroupCounts] = useState<Record<string, number>>({});
+  const [productCounts, setProductCounts] = useState<Record<string, number>>(
+    {},
+  );
+  const [feeWaived, setFeeWaived] = useState(false);
+  const [note, setNote] = useState("");
+  const [mode, setMode] = useState<Mode>({ type: "new" });
+  const [ticketSerial, setTicketSerial] = useState<string | null>(null);
+  const [deleteTicketTarget, setDeleteTicketTarget] = useState<Ticket | null>(
+    null,
+  );
+  const [deleteTransactionTarget, setDeleteTransactionTarget] =
+    useState<Transaction | null>(null);
 
-  const feeLines = useMemo(() => buildFeeLines(feeItems, feeCounts), [feeItems, feeCounts])
-  const groupLines = useMemo(() => buildGroupLines(groupItems, groupCounts), [groupItems, groupCounts])
-  const productLines = useMemo(() => buildProductLines(products, productCounts), [products, productCounts])
-  const feeTotal = feeWaived ? 0 : calcFeeTotal(feeLines, groupLines)
-  const productTotal = calcProductTotal(productLines)
-  const grandTotal = feeTotal + productTotal
-  const entryCount = calcEntryCount(feeLines)
+  const feeLines = useMemo(
+    () => buildFeeLines(feeItems, feeCounts),
+    [feeItems, feeCounts],
+  );
+  const groupLines = useMemo(
+    () => buildGroupLines(groupItems, groupCounts),
+    [groupItems, groupCounts],
+  );
+  const productLines = useMemo(
+    () => buildProductLines(products, productCounts),
+    [products, productCounts],
+  );
+  const feeTotal = feeWaived ? 0 : calcFeeTotal(feeLines, groupLines);
+  const productTotal = calcProductTotal(productLines);
+  const grandTotal = feeTotal + productTotal;
+  const entryCount = calcEntryCount(feeLines);
   // グループ料金のみの入力では確定できない（入場料項目か物販が1件以上必要）
-  const canConfirm = feeLines.some((l) => l.qty > 0) || productLines.some((l) => l.qty > 0)
+  const canConfirm =
+    feeLines.some((l) => l.qty > 0) || productLines.some((l) => l.qty > 0);
+  const canSubmit = canConfirm && staffListReady && staff !== null;
 
   const resetForm = () => {
-    setFeeCounts({})
-    setGroupCounts({})
-    setProductCounts({})
-    setFeeWaived(false)
-    setNote('')
-    setMode({ type: 'new' })
-  }
+    setFeeCounts({});
+    setGroupCounts({});
+    setProductCounts({});
+    setFeeWaived(false);
+    setNote("");
+    setMode({ type: "new" });
+  };
 
-  const loadCountsFrom = (
-    lines: { feeLines: Transaction['feeLines']; groupLines: Transaction['groupLines']; productLines: Transaction['productLines']; feeWaived: boolean; note: string },
-  ) => {
-    setFeeCounts(Object.fromEntries(lines.feeLines.map((l) => [l.itemId, l.qty])))
-    setGroupCounts(Object.fromEntries(lines.groupLines.map((l) => [l.itemId, l.qty])))
-    setProductCounts(Object.fromEntries(lines.productLines.map((l) => [l.productId, l.qty])))
-    setFeeWaived(lines.feeWaived)
-    setNote(lines.note)
-  }
+  const loadCountsFrom = (lines: {
+    feeLines: Transaction["feeLines"];
+    groupLines: Transaction["groupLines"];
+    productLines: Transaction["productLines"];
+    feeWaived: boolean;
+    note: string;
+  }) => {
+    setFeeCounts(
+      Object.fromEntries(lines.feeLines.map((l) => [l.itemId, l.qty])),
+    );
+    setGroupCounts(
+      Object.fromEntries(lines.groupLines.map((l) => [l.itemId, l.qty])),
+    );
+    setProductCounts(
+      Object.fromEntries(lines.productLines.map((l) => [l.productId, l.qty])),
+    );
+    setFeeWaived(lines.feeWaived);
+    setNote(lines.note);
+  };
 
   const handleConfirm = async () => {
-    if (!canConfirm) return
+    if (!canConfirm) return;
+    if (!staffListReady) {
+      alert("担当者名簿を確認できません。通信状態を確認してください");
+      return;
+    }
     if (!staff) {
-      alert('スタッフを選択してください')
-      return
+      alert("スタッフを選択してください");
+      return;
     }
-    if (mode.type === 'edit') {
-      await updateTransaction(env, yearId, mode.transactionId, {
-        feeLines,
-        groupLines,
-        feeWaived,
-        feeTotal,
-        productLines,
-        productTotal,
-        grandTotal,
-        note,
-        entryCount,
-      })
-    } else {
-      await confirmTransaction(env, yearId, {
-        feeLines,
-        groupLines,
-        feeWaived,
-        feeTotal,
-        productLines,
-        productTotal,
-        grandTotal,
-        note,
-        staffId: staff.id,
-        staffName: staff.name,
-        entryCount,
-        ticketId: mode.type === 'ticket' ? mode.ticketId : null,
-      })
+    try {
+      if (mode.type === "edit") {
+        await updateTransaction(env, yearId, mode.transactionId, staff.id, {
+          feeLines,
+          groupLines,
+          feeWaived,
+          feeTotal,
+          productLines,
+          productTotal,
+          grandTotal,
+          note,
+          entryCount,
+        });
+      } else {
+        await confirmTransaction(env, yearId, {
+          feeLines,
+          groupLines,
+          feeWaived,
+          feeTotal,
+          productLines,
+          productTotal,
+          grandTotal,
+          note,
+          staffId: staff.id,
+          staffName: staff.name,
+          entryCount,
+          ticketId: mode.type === "ticket" ? mode.ticketId : null,
+        });
+      }
+    } catch (error) {
+      alert(
+        error instanceof Error
+          ? error.message
+          : "会計を確定できませんでした。通信状態を確認してください",
+      );
+      return;
     }
-    resetForm()
-  }
+    resetForm();
+  };
 
   const handleIssueTicket = () => {
-    setTicketSerial(generateSerial())
-  }
+    setTicketSerial(generateSerial());
+  };
 
   const handleTicketModalConfirm = async (arrivalTime: string) => {
-    if (!ticketSerial) return
+    if (!ticketSerial) return;
     await issueTicket(env, yearId, ticketSerial, arrivalTime, {
       feeLines,
       groupLines,
       feeWaived,
       productLines,
       note,
-    })
-    setTicketSerial(null)
-    resetForm()
-  }
+    });
+    setTicketSerial(null);
+    resetForm();
+  };
 
   const handleSettleTicket = (ticket: Ticket) => {
-    loadCountsFrom(ticket.pendingData)
-    setMode({ type: 'ticket', ticketId: ticket.id })
-  }
+    loadCountsFrom(ticket.pendingData);
+    setMode({ type: "ticket", ticketId: ticket.id });
+  };
 
   const handleDeleteTicket = async (ticket: Ticket) => {
-    await deleteTicket(env, yearId, ticket.id)
-    setDeleteTicketTarget(null)
-  }
+    await deleteTicket(env, yearId, ticket.id);
+    setDeleteTicketTarget(null);
+  };
 
   const handleEditTransaction = (t: Transaction) => {
-    loadCountsFrom(t)
-    setMode({ type: 'edit', transactionId: t.id })
-  }
+    loadCountsFrom(t);
+    setMode({ type: "edit", transactionId: t.id });
+  };
 
   // 履歴一覧（設定タブ）からの編集要求を受け取り、編集モードで開く。
   // 消費直後に親側の状態をリセットして再トリガーを防ぐ
   useEffect(() => {
-    if (!externalEditTarget) return
-    loadCountsFrom(externalEditTarget)
-    setMode({ type: 'edit', transactionId: externalEditTarget.id })
-    onExternalEditConsumed?.()
+    if (!externalEditTarget) return;
+    loadCountsFrom(externalEditTarget);
+    setMode({ type: "edit", transactionId: externalEditTarget.id });
+    onExternalEditConsumed?.();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [externalEditTarget])
+  }, [externalEditTarget]);
 
   const handleDeleteTransaction = async (t: Transaction) => {
-    await deleteTransaction(env, yearId, t.id)
-    setDeleteTransactionTarget(null)
-  }
+    await deleteTransaction(env, yearId, t.id);
+    setDeleteTransactionTarget(null);
+  };
 
   return (
     // PC横画面で1画面に収まるよう左右2エリア構成
@@ -196,18 +249,22 @@ export function RegisterTab({
                 <CounterInput
                   key={item.id}
                   label={item.label}
-                  sublabel={`${formatYen(item.unitPrice)} / ${item.unit || '人'}`}
+                  sublabel={`${formatYen(item.unitPrice)} / ${item.unit || "人"}`}
                   value={feeCounts[item.id] ?? 0}
-                  onChange={(v) => setFeeCounts((c) => ({ ...c, [item.id]: v }))}
+                  onChange={(v) =>
+                    setFeeCounts((c) => ({ ...c, [item.id]: v }))
+                  }
                 />
               ))}
               {groupItems.map((item) => (
                 <CounterInput
                   key={item.id}
                   label={item.label}
-                  sublabel={`${formatYen(item.price)} / ${item.unit || 'グループ'}`}
+                  sublabel={`${formatYen(item.price)} / ${item.unit || "グループ"}`}
                   value={groupCounts[item.id] ?? 0}
-                  onChange={(v) => setGroupCounts((c) => ({ ...c, [item.id]: v }))}
+                  onChange={(v) =>
+                    setGroupCounts((c) => ({ ...c, [item.id]: v }))
+                  }
                 />
               ))}
             </div>
@@ -228,9 +285,11 @@ export function RegisterTab({
                 <CounterInput
                   key={product.id}
                   label={product.name}
-                  sublabel={`${formatYen(product.unitPrice)} / ${product.unit || '個'}`}
+                  sublabel={`${formatYen(product.unitPrice)} / ${product.unit || "個"}`}
                   value={productCounts[product.id] ?? 0}
-                  onChange={(v) => setProductCounts((c) => ({ ...c, [product.id]: v }))}
+                  onChange={(v) =>
+                    setProductCounts((c) => ({ ...c, [product.id]: v }))
+                  }
                 />
               ))}
             </div>
@@ -263,9 +322,11 @@ export function RegisterTab({
 
       <div className="contents lg:col-start-3 lg:row-start-1 lg:block lg:space-y-6">
         <div className="order-1 rounded-xl border border-neutral-200 bg-white p-5">
-          {mode.type !== 'new' && (
+          {mode.type !== "new" && (
             <p className="mb-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-700">
-              {mode.type === 'ticket' ? '整理券の精算中です' : '履歴を編集中です'}
+              {mode.type === "ticket"
+                ? "整理券の精算中です"
+                : "履歴を編集中です"}
               <button onClick={resetForm} className="ml-2 underline">
                 キャンセル
               </button>
@@ -280,20 +341,24 @@ export function RegisterTab({
             <span>{formatYen(productTotal)}</span>
           </div>
           <div className="mb-4 flex items-baseline justify-between border-t border-neutral-100 pt-3">
-            <span className="text-sm font-medium text-neutral-700">合計金額</span>
-            <span className="text-2xl font-bold text-neutral-900">{formatYen(grandTotal)}</span>
+            <span className="text-sm font-medium text-neutral-700">
+              合計金額
+            </span>
+            <span className="text-2xl font-bold text-neutral-900">
+              {formatYen(grandTotal)}
+            </span>
           </div>
 
           <button
             onClick={handleConfirm}
-            disabled={!canConfirm}
+            disabled={!canSubmit}
             className="w-full rounded-lg bg-neutral-900 py-3 text-sm font-semibold text-white transition hover:bg-neutral-700 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            {mode.type === 'edit' ? '更新する' : '確定'}
+            {mode.type === "edit" ? "更新する" : "確定"}
           </button>
           <button
             onClick={handleIssueTicket}
-            disabled={mode.type !== 'new' || !feeLines.some((l) => l.qty > 0)}
+            disabled={mode.type !== "new" || !feeLines.some((l) => l.qty > 0)}
             className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg border border-neutral-300 py-2.5 text-sm text-neutral-700 transition hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-40"
           >
             <TagOutlined /> 整理券配布
@@ -335,5 +400,5 @@ export function RegisterTab({
         />
       )}
     </div>
-  )
+  );
 }

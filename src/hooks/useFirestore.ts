@@ -1,5 +1,5 @@
 // Firestoreのリアルタイム購読を扱う汎用Hook群
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from "react";
 import {
   collection,
   doc,
@@ -7,8 +7,8 @@ import {
   query,
   type QueryConstraint,
   type DocumentData,
-} from 'firebase/firestore'
-import { db } from '@/lib/firebase'
+} from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 /**
  * コレクションをリアルタイム購読し、id付きの配列として返す。
@@ -24,46 +24,60 @@ export function useCollectionData<T extends DocumentData>(
   constraints: QueryConstraint[] = [],
   deps: unknown[] = [],
 ) {
-  const [data, setData] = useState<(T & { id: string })[]>([])
-  const [loading, setLoading] = useState(true)
+  const [data, setData] = useState<(T & { id: string })[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     if (!path) {
-      setData([])
-      setLoading(false)
-      return
+      setData([]);
+      setLoading(false);
+      setError(null);
+      return;
     }
-    setLoading(true)
-    const q = query(collection(db, path), ...constraints)
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      setData(snapshot.docs.map((d) => ({ id: d.id, ...(d.data() as T) })))
-      setLoading(false)
-    })
-    return unsubscribe
+    setLoading(true);
+    setError(null);
+    const q = query(collection(db, path), ...constraints);
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        setData(snapshot.docs.map((d) => ({ id: d.id, ...(d.data() as T) })));
+        setLoading(false);
+      },
+      (nextError) => {
+        setError(nextError);
+        setLoading(false);
+      },
+    );
+    return unsubscribe;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [path, ...deps])
+  }, [path, ...deps]);
 
-  return { data, loading }
+  return { data, loading, error };
 }
 
 /** 単一ドキュメントをリアルタイム購読する */
 export function useDocumentData<T extends DocumentData>(path: string | null) {
-  const [data, setData] = useState<(T & { id: string }) | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [data, setData] = useState<(T & { id: string }) | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!path) {
-      setData(null)
-      setLoading(false)
-      return
+      setData(null);
+      setLoading(false);
+      return;
     }
-    setLoading(true)
+    setLoading(true);
     const unsubscribe = onSnapshot(doc(db, path), (snapshot) => {
-      setData(snapshot.exists() ? ({ id: snapshot.id, ...(snapshot.data() as T) }) : null)
-      setLoading(false)
-    })
-    return unsubscribe
-  }, [path])
+      setData(
+        snapshot.exists()
+          ? { id: snapshot.id, ...(snapshot.data() as T) }
+          : null,
+      );
+      setLoading(false);
+    });
+    return unsubscribe;
+  }, [path]);
 
-  return { data, loading }
+  return { data, loading };
 }
