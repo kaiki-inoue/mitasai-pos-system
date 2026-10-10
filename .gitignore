@@ -20,6 +20,7 @@ dist-ssr
 
 # 非公開ドキュメント
 setup-instructions.md
+TODO.md
 
 # エディタ・OS固有のファイル
 .vscode/*
