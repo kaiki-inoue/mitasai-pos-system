@@ -9,6 +9,8 @@ import { recordRegisterSession } from "@/lib/dataApi";
 import { CASH_DENOMINATIONS } from "@/utils/defaults";
 import { formatDateTime, formatYen } from "@/utils/format";
 import { DatePicker } from "@/components/common/DatePicker";
+import { NotificationModal } from "@/components/common/NotificationModal";
+import { getUserFacingErrorMessage } from "@/utils/userFacingError";
 
 export function RegisterSessionPanel({
   env,
@@ -25,6 +27,7 @@ export function RegisterSessionPanel({
   const [date, setDate] = useState("");
   // 金種の枚数は「0」を明示的に入力させるため、入力前は空文字列で保持する
   const [cashCounts, setCashCounts] = useState<Record<string, string>>({});
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
   // 日付未選択の間は購読しない（yearId に null を渡すとフックが購読を停止する）
   const { data: sessions } = useRegisterSessions(
@@ -62,11 +65,11 @@ export function RegisterSessionPanel({
   const handleRecord = async (type: "open" | "close") => {
     if (!date || !allFilled) return;
     if (!staffListReady) {
-      alert("担当者名簿を確認できません。通信状態を確認してください");
+      setAlertMessage("担当者名簿を確認できません。通信状態を確認してください");
       return;
     }
     if (!staff) {
-      alert("スタッフを選択してください");
+      setAlertMessage("スタッフを選択してください");
       return;
     }
     const expectedAmount =
@@ -90,10 +93,11 @@ export function RegisterSessionPanel({
           expectedAmount !== null ? totalAmount - expectedAmount : null,
       });
     } catch (error) {
-      alert(
-        error instanceof Error
-          ? error.message
-          : "記録できませんでした。通信状態を確認してください",
+      setAlertMessage(
+        getUserFacingErrorMessage(
+          error,
+          "レジの記録を保存できませんでした。画面を再読み込みして、もう一度お試しください。繰り返し発生する場合は管理者にお問い合わせください。",
+        ),
       );
       return;
     }
@@ -173,6 +177,13 @@ export function RegisterSessionPanel({
 
           <SessionHistory sessions={sessions} salesTotal={salesTotal} />
         </>
+      )}
+
+      {alertMessage && (
+        <NotificationModal
+          message={alertMessage}
+          onClose={() => setAlertMessage(null)}
+        />
       )}
     </section>
   );

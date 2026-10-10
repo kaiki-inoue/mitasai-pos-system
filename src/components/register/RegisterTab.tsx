@@ -33,6 +33,8 @@ import { TicketModal } from "./TicketModal";
 import { TicketList } from "./TicketList";
 import { RecentHistoryList } from "./RecentHistoryList";
 import { ConfirmDeleteModal } from "@/components/common/ConfirmDeleteModal";
+import { NotificationModal } from "@/components/common/NotificationModal";
+import { getUserFacingErrorMessage } from "@/utils/userFacingError";
 
 type Mode =
   | { type: "new" }
@@ -80,6 +82,7 @@ export function RegisterTab({
   const [note, setNote] = useState("");
   const [mode, setMode] = useState<Mode>({ type: "new" });
   const [ticketSerial, setTicketSerial] = useState<string | null>(null);
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [deleteTicketTarget, setDeleteTicketTarget] = useState<Ticket | null>(
     null,
   );
@@ -139,11 +142,11 @@ export function RegisterTab({
   const handleConfirm = async () => {
     if (!canConfirm) return;
     if (!staffListReady) {
-      alert("担当者名簿を確認できません。通信状態を確認してください");
+      setAlertMessage("担当者名簿を確認できません。通信状態を確認してください");
       return;
     }
     if (!staff) {
-      alert("スタッフを選択してください");
+      setAlertMessage("スタッフを選択してください");
       return;
     }
     try {
@@ -176,10 +179,11 @@ export function RegisterTab({
         });
       }
     } catch (error) {
-      alert(
-        error instanceof Error
-          ? error.message
-          : "会計を確定できませんでした。通信状態を確認してください",
+      setAlertMessage(
+        getUserFacingErrorMessage(
+          error,
+          "会計を保存できませんでした。画面を再読み込みして、もう一度お試しください。繰り返し発生する場合は管理者にお問い合わせください。",
+        ),
       );
       return;
     }
@@ -379,6 +383,13 @@ export function RegisterTab({
           serial={ticketSerial}
           onCancel={() => setTicketSerial(null)}
           onConfirm={handleTicketModalConfirm}
+        />
+      )}
+
+      {alertMessage && (
+        <NotificationModal
+          message={alertMessage}
+          onClose={() => setAlertMessage(null)}
         />
       )}
 
