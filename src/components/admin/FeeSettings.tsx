@@ -81,9 +81,17 @@ export function FeeSettings({
     feeOrderChanged ||
     groupOrderChanged;
 
-  // ラベルと正の金額が入力されて初めて追加できる（0円項目は誤入力とみなす）
-  const canAddFee = newFeeLabel.trim() !== "" && Number(newFeePrice) > 0;
-  const canAddGroup = newGroupLabel.trim() !== "" && Number(newGroupPrice) > 0;
+  // ラベルと0円以上の金額が入力されて初めて追加できる（空欄は許可しない）
+  const canAddFee =
+    newFeeLabel.trim() !== "" &&
+    newFeePrice.trim() !== "" &&
+    Number.isFinite(Number(newFeePrice)) &&
+    Number(newFeePrice) >= 0;
+  const canAddGroup =
+    newGroupLabel.trim() !== "" &&
+    newGroupPrice.trim() !== "" &&
+    Number.isFinite(Number(newGroupPrice)) &&
+    Number(newGroupPrice) >= 0;
 
   const feeDnd = useDragReorder((from, to) =>
     setFeeOrder(
@@ -289,6 +297,7 @@ export function FeeSettings({
               />
               <input
                 type="number"
+                min="0"
                 value={newFeePrice}
                 onChange={(e) => setNewFeePrice(e.target.value)}
                 placeholder="500"
@@ -381,6 +390,7 @@ export function FeeSettings({
               />
               <input
                 type="number"
+                min="0"
                 value={newGroupPrice}
                 onChange={(e) => setNewGroupPrice(e.target.value)}
                 placeholder="1000"

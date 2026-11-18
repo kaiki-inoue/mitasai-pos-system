@@ -45,8 +45,12 @@ export function ProductSettings({
     orderedProducts.map((p) => p.id).join(",") !==
       products.map((p) => p.id).join(",");
   const dirty = Object.keys(drafts).length > 0 || orderChanged;
-  // 商品名と正の金額が入力されて初めて追加できる（0円商品は誤入力とみなす）
-  const canAdd = newName.trim() !== "" && Number(newPrice) > 0;
+  // 商品名と0円以上の金額が入力されて初めて追加できる（空欄は許可しない）
+  const canAdd =
+    newName.trim() !== "" &&
+    newPrice.trim() !== "" &&
+    Number.isFinite(Number(newPrice)) &&
+    Number(newPrice) >= 0;
 
   const dnd = useDragReorder((from, to) =>
     setOrder(
@@ -190,6 +194,7 @@ export function ProductSettings({
               />
               <input
                 type="number"
+                min="0"
                 value={newPrice}
                 onChange={(e) => setNewPrice(e.target.value)}
                 placeholder="500"
