@@ -32,6 +32,7 @@ import { CounterInput } from "./CounterInput";
 import { TicketModal } from "./TicketModal";
 import { TicketList } from "./TicketList";
 import { RecentHistoryList } from "./RecentHistoryList";
+import { SalesSummaryPanel } from "./SalesSummaryPanel";
 import { ConfirmDeleteModal } from "@/components/common/ConfirmDeleteModal";
 import { NotificationModal } from "@/components/common/NotificationModal";
 import { getUserFacingErrorMessage } from "@/utils/userFacingError";
@@ -442,6 +443,16 @@ export function RegisterTab({
         </div>
 
         <div className="order-6">
+          <SalesSummaryPanel
+            env={env}
+            yearId={yearId}
+            feeItems={feeItems}
+            groupItems={groupItems}
+            products={products}
+          />
+        </div>
+
+        <div className="order-7">
           <TicketList
             tickets={pendingTickets}
             onSettle={handleSettleTicket}
