@@ -1,5 +1,5 @@
 // 金額計算タブ：入場料・グループ料金・物販の入力と確定
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import { TagOutlined } from "@ant-design/icons";
 import type {
   EnvName,
@@ -80,6 +80,7 @@ export function RegisterTab({
   );
   const [feeWaived, setFeeWaived] = useState(false);
   const [note, setNote] = useState("");
+  const [receivedAmount, setReceivedAmount] = useState("");
   const [mode, setMode] = useState<Mode>({ type: "new" });
   const [ticketSerial, setTicketSerial] = useState<string | null>(null);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
@@ -104,6 +105,34 @@ export function RegisterTab({
   const feeTotal = feeWaived ? 0 : calcFeeTotal(feeLines, groupLines);
   const productTotal = calcProductTotal(productLines);
   const grandTotal = feeTotal + productTotal;
+  const receivedAmountValue =
+    receivedAmount !== "" &&
+    Number.isInteger(Number(receivedAmount)) &&
+    Number(receivedAmount) >= 0
+      ? Number(receivedAmount)
+      : null;
+  const changeAmount =
+    receivedAmountValue !== null ? receivedAmountValue - grandTotal : null;
+  const handleReceivedAmountChange = (
+    event: ChangeEvent<HTMLInputElement>,
+  ) => {
+    const input = event.currentTarget;
+    const cursorPosition = input.selectionStart ?? input.value.length;
+    const digitsBeforeCursor = input.value
+      .slice(0, cursorPosition)
+      .replace(/\D/g, "").length;
+    const digits = input.value.replace(/\D/g, "");
+    setReceivedAmount(digits);
+
+    const formattedValue = formatIntegerWithCommas(digits);
+    requestAnimationFrame(() => {
+      const nextCursorPosition = cursorPositionAfterDigits(
+        formattedValue,
+        digitsBeforeCursor,
+      );
+      input.setSelectionRange(nextCursorPosition, nextCursorPosition);
+    });
+  };
   const entryCount = calcEntryCount(feeLines);
   // グループ料金のみの入力では確定できない（入場料項目か物販が1件以上必要）
   const canConfirm =
@@ -116,6 +145,7 @@ export function RegisterTab({
     setProductCounts({});
     setFeeWaived(false);
     setNote("");
+    setReceivedAmount("");
     setMode({ type: "new" });
   };
 
@@ -126,6 +156,7 @@ export function RegisterTab({
     feeWaived: boolean;
     note: string;
   }) => {
+    setReceivedAmount("");
     setFeeCounts(
       Object.fromEntries(lines.feeLines.map((l) => [l.itemId, l.qty])),
     );
@@ -327,7 +358,7 @@ export function RegisterTab({
       <div className="contents lg:col-start-3 lg:row-start-1 lg:block lg:space-y-6">
         <div className="order-1 rounded-xl border border-neutral-200 bg-white p-5">
           {mode.type !== "new" && (
-            <p className="mb-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-700">
+            <p className="mb-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-600">
               {mode.type === "ticket"
                 ? "整理券の精算中です"
                 : "履歴を編集中です"}
@@ -336,22 +367,63 @@ export function RegisterTab({
               </button>
             </p>
           )}
-          <div className="mb-1 flex justify-between text-sm text-neutral-500">
+          <div className="mb-1 flex items-center justify-between text-sm text-neutral-500">
             <span>入場料</span>
-            <span>{formatYen(feeTotal)}</span>
+            <span className="w-32 shrink-0 pr-2.5 text-right tabular-nums">
+              {formatYen(feeTotal)}
+            </span>
           </div>
-          <div className="mb-3 flex justify-between text-sm text-neutral-500">
+          <div className="mb-3 flex items-center justify-between text-sm text-neutral-500">
             <span>物販</span>
-            <span>{formatYen(productTotal)}</span>
+            <span className="w-32 shrink-0 pr-2.5 text-right tabular-nums">
+              {formatYen(productTotal)}
+            </span>
           </div>
-          <div className="mb-4 flex items-baseline justify-between border-t border-neutral-100 pt-3">
+          <div className="mb-4 flex items-center justify-between border-t border-neutral-100 pt-3">
             <span className="text-sm font-medium text-neutral-700">
               合計金額
             </span>
-            <span className="text-2xl font-bold text-neutral-900">
+            <span className="w-32 shrink-0 pr-2.5 text-right text-2xl font-bold tabular-nums text-neutral-900">
               {formatYen(grandTotal)}
             </span>
           </div>
+
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <label
+              htmlFor="received-amount"
+              className="shrink-0 text-sm text-neutral-600"
+            >
+              お預かり{" "}
+              <span className="text-xs text-neutral-400">（任意）</span>
+            </label>
+            <span className="flex h-8 w-28 shrink-0 items-center rounded-lg border border-neutral-300 px-2.5 focus-within:border-neutral-900">
+              <span className="mr-1 text-sm text-neutral-500">¥</span>
+              <input
+                id="received-amount"
+                type="text"
+                inputMode="numeric"
+                value={formatIntegerWithCommas(receivedAmount)}
+                onChange={handleReceivedAmountChange}
+                aria-label="お預かり金額（任意）"
+                className="min-w-0 flex-1 appearance-none bg-transparent p-0 text-right text-sm tabular-nums text-neutral-900 outline-none"
+              />
+            </span>
+          </div>
+          {changeAmount !== null && receivedAmount !== "" && (
+            <div
+              className={`mb-4 flex items-center justify-between text-sm ${
+                changeAmount < 0
+                  ? "text-amber-600"
+                  : "font-medium text-neutral-800"
+              }`}
+              aria-live="polite"
+            >
+              <span>{changeAmount < 0 ? "不足額" : "お釣り"}</span>
+              <span className="w-32 shrink-0 pr-2.5 text-right tabular-nums">
+                {formatYen(Math.abs(changeAmount))}
+              </span>
+            </div>
+          )}
 
           <button
             onClick={handleConfirm}
@@ -412,4 +484,18 @@ export function RegisterTab({
       )}
     </div>
   );
+}
+
+function formatIntegerWithCommas(value: string): string {
+  return value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function cursorPositionAfterDigits(value: string, digitCount: number): number {
+  if (digitCount === 0) return 0;
+  let digitsSeen = 0;
+  for (let index = 0; index < value.length; index += 1) {
+    if (/\d/.test(value[index])) digitsSeen += 1;
+    if (digitsSeen === digitCount) return index + 1;
+  }
+  return value.length;
 }
