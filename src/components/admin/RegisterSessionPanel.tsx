@@ -350,7 +350,7 @@ export function RegisterSessionPanel({
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h3 className="text-sm font-semibold text-neutral-700">
-              開催期間のレジ履歴
+              レジ履歴
             </h3>
           </div>
           <div className="flex items-center gap-2 whitespace-nowrap">
