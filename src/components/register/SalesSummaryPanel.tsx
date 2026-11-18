@@ -138,7 +138,7 @@ export function SalesSummaryPanel({
       )}
 
       <div className="space-y-1 text-xs">
-        <div className="grid grid-cols-[40%_27%_33%] pb-1 text-neutral-500">
+        <div className="grid grid-cols-[40%_27%_33%] px-2 pb-1 text-neutral-500">
           <span />
           <span className="text-right font-medium">本日</span>
           <span className="text-right font-medium">開催期間累計</span>
@@ -238,7 +238,7 @@ function SummaryRow({
   detailsId?: string;
   onClick?: () => void;
 }) {
-  const className = `grid w-full grid-cols-[40%_27%_33%] items-center text-left ${
+  const className = `grid w-full grid-cols-[40%_27%_33%] items-center px-2 text-left ${
     total
       ? "border-t border-neutral-200 pt-2 text-neutral-900"
       : subtotal
@@ -290,7 +290,7 @@ function SummaryDetail({
   period: SummaryValue;
 }) {
   return (
-    <div className="grid grid-cols-[40%_27%_33%] items-center py-1">
+    <div className="grid grid-cols-[40%_27%_33%] items-center px-2 py-1">
       <span className="truncate pl-2">{label}</span>
       <span className="text-right tabular-nums text-neutral-700">
         {today.amount}
