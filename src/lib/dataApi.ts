@@ -392,3 +392,55 @@ export async function recordRegisterSession(
     });
   });
 }
+
+/** レジ開け・締めの金額を訂正し、訂正前の値と訂正者を記録する */
+export async function updateRegisterSession(
+  env: EnvName,
+  yearId: string,
+  sessionId: string,
+  input: {
+    staffId: string;
+    cashBreakdown: CashBreakdown;
+    totalAmount: number;
+  },
+): Promise<void> {
+  const sessionRef = doc(db, registerSessionsPath(env, yearId), sessionId);
+  const updatedAt = Date.now();
+
+  await runTransaction(db, async (transaction) => {
+    const snapshot = await transaction.get(sessionRef);
+    if (!snapshot.exists()) {
+      throw new Error("訂正対象のレジ記録が見つかりません。画面を再読み込みしてください");
+    }
+
+    const currentStaff = await readActiveStaff(
+      transaction,
+      env,
+      yearId,
+      input.staffId,
+    );
+    const current = snapshot.data();
+    const revisions = Array.isArray(current.revisions) ? current.revisions : [];
+
+    transaction.update(sessionRef, {
+      cashBreakdown: input.cashBreakdown,
+      totalAmount: input.totalAmount,
+      updatedAt,
+      updatedByStaffId: currentStaff.id,
+      updatedByStaffName: currentStaff.name,
+      revisions: [
+        ...revisions,
+        {
+          cashBreakdown: current.cashBreakdown,
+          totalAmount: current.totalAmount,
+          staffId: current.updatedByStaffId ?? current.staffId,
+          staffName: current.updatedByStaffName ?? current.staffName,
+          recordedAt: current.updatedAt ?? current.createdAt,
+          revisedAt: updatedAt,
+          revisedByStaffId: currentStaff.id,
+          revisedByStaffName: currentStaff.name,
+        },
+      ],
+    });
+  });
+}

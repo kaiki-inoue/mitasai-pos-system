@@ -157,4 +157,20 @@ export interface RegisterSession {
   diffFromOpen: number | null // レジ締めのみ：レジ開けとの差額
   diffFromSales: number | null // レジ締めのみ：売上集計との差額
   createdAt: number
+  updatedAt?: number
+  updatedByStaffId?: string
+  updatedByStaffName?: string
+  revisions?: RegisterSessionRevision[]
+}
+
+/** レジ開け・締めの訂正前記録と訂正者 */
+export interface RegisterSessionRevision {
+  cashBreakdown: CashBreakdown
+  totalAmount: number
+  staffId: string
+  staffName: string
+  recordedAt: number
+  revisedAt: number
+  revisedByStaffId: string
+  revisedByStaffName: string
 }

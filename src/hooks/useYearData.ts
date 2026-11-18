@@ -108,3 +108,14 @@ export function useRegisterSessions(env: EnvName | null, yearId: string | null, 
     [date],
   )
 }
+
+/** 開催期間中のレジ記録一覧（設定画面の照合表用） */
+export function useRegisterSessionsByYear(
+  env: EnvName | null,
+  yearId: string | null,
+) {
+  return useCollectionData<RegisterSession>(
+    env && yearId ? registerSessionsPath(env, yearId) : null,
+    [orderBy('date', 'asc'), orderBy('createdAt', 'asc')],
+  )
+}
