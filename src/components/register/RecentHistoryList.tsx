@@ -47,7 +47,7 @@ export function RecentHistoryList({
                 <span className="w-14 shrink-0 text-sm font-medium text-neutral-900">
                   {formatYen(t.grandTotal)}
                 </span>
-                <span className="w-28 shrink-0 text-xs tabular-nums text-neutral-400">
+                <span className="w-28 shrink-0 whitespace-nowrap text-xs tabular-nums text-neutral-400">
                   {formatDateTime(t.createdAt)}
                 </span>
                 <span className="w-18 shrink-0 truncate text-xs text-neutral-400">
