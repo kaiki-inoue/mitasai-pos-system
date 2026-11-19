@@ -19,8 +19,8 @@ export function TicketList({ tickets, onSettle, onDelete }: Props) {
         <ul className="divide-y divide-neutral-100">
           {tickets.map((ticket) => (
             <li key={ticket.id} className="flex items-center justify-between py-2.5">
-              <div className="flex items-center gap-3">
-                <span className="rounded-md bg-neutral-100 px-2 py-1 font-mono text-sm font-semibold text-neutral-800">
+              <div className="flex items-center gap-1">
+                <span className="rounded-md bg-neutral-100 px-1 py-1 font-mono text-sm font-semibold text-neutral-800">
                   {ticket.serial}
                 </span>
                 <span className="text-xs text-neutral-600">
@@ -30,7 +30,7 @@ export function TicketList({ tickets, onSettle, onDelete }: Props) {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => onSettle(ticket)}
-                  className="flex items-center gap-1 rounded-lg bg-neutral-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-neutral-700"
+                  className="flex h-8 items-center gap-1 rounded-lg bg-neutral-900 px-3 text-xs font-medium text-white hover:bg-neutral-700"
                 >
                   <CheckOutlined /> 精算
                 </button>
