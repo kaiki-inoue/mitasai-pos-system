@@ -308,6 +308,6 @@ function formatQuantityLabel(label: string, unit: string): string {
 }
 
 function formatGroupQuantityLabel(label: string, unit: string): string {
-  if (unit === label || !unit) return `${label}数`;
+  if (!unit) return label;
   return `${label}（${unit}）`;
 }
