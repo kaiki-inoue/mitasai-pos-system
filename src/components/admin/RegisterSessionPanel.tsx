@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { DownOutlined } from "@ant-design/icons";
 import type {
   CashBreakdown,
   EnvName,
@@ -384,18 +385,18 @@ export function RegisterSessionPanel({
           </p>
         )}
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[900px] table-fixed border-collapse text-xs">
+          <table className="w-full min-w-[872px] table-fixed border-collapse text-xs">
             <colgroup>
-              <col className="w-14" />
-              <col className="w-24" />
-              <col className="w-28" />
-              <col className="w-20" />
-              <col className="w-24" />
-              <col className="w-24" />
-              <col className="w-24" />
-              <col className="w-24" />
-              <col className="w-28" />
-              <col className="w-20" />
+              <col className="w-16" />
+              <col className="w-[88px]" />
+              <col className="w-36" />
+              <col className="w-10" />
+              <col className="w-[88px]" />
+              <col className="w-[88px]" />
+              <col className="w-[88px]" />
+              <col className="w-[88px]" />
+              <col className="w-36" />
+              <col className="w-10" />
             </colgroup>
             <thead>
               <tr className="text-neutral-700">
@@ -425,7 +426,7 @@ export function RegisterSessionPanel({
                 </th>
               </tr>
               <tr className="text-neutral-500">
-                <th className="border-b border-l border-neutral-200 px-2 py-1 text-center font-medium">
+                <th className="border-b border-l border-neutral-200 px-1 py-1 text-center font-medium">
                   金額
                 </th>
                 <th className="border-b border-neutral-200 px-2 py-1 text-center font-medium">
@@ -434,23 +435,23 @@ export function RegisterSessionPanel({
                 <th className="border-b border-neutral-200 px-1 py-1" />
                 <th
                   title="レジ受付の取引履歴に記録された売上の合計"
-                  className="border-b border-l border-neutral-200 px-2 py-1 text-center font-medium"
+                  className="border-b border-l border-neutral-200 px-1 py-1 text-center font-medium"
                 >
                   会計記録売上
                 </th>
                 <th
                   title="レジ締め額からレジ開け額を引いた額"
-                  className="border-b border-neutral-200 px-2 py-1 text-center font-medium"
+                  className="border-b border-neutral-200 px-1 py-1 text-center font-medium"
                 >
                   現金増加額
                 </th>
                 <th
                   title="現金増加額から会計記録売上を引いた額"
-                  className="border-b border-neutral-200 px-2 py-1 text-center font-medium"
+                  className="border-b border-neutral-200 px-1 py-1 text-center font-medium"
                 >
                   差額
                 </th>
-                <th className="border-b border-l border-neutral-200 px-2 py-1 text-center font-medium">
+                <th className="border-b border-l border-neutral-200 px-1 py-1 text-center font-medium">
                   金額
                 </th>
                 <th className="border-b border-neutral-200 px-2 py-1 text-center font-medium">
@@ -479,28 +480,21 @@ export function RegisterSessionPanel({
                   cashIncrease !== null && receiptSales !== undefined
                     ? cashIncrease - receiptSales
                     : null;
-                const isToday = day === today;
-
                 return (
                   <tr
                     key={day}
-                    className={isToday ? "bg-amber-50/70" : "hover:bg-neutral-50"}
+                    className="hover:bg-neutral-50"
                   >
                     <th className="border-b border-neutral-100 px-2 py-2 text-left font-medium text-neutral-700">
                       {monthDay(day)}
-                      {isToday && (
-                        <span className="ml-1 text-[10px] text-amber-600">
-                          今日
-                        </span>
-                      )}
                     </th>
-                    <td className="border-b border-l border-neutral-100 px-2 py-2 text-right tabular-nums text-neutral-800">
+                    <td className="border-b border-l border-neutral-100 px-1 py-2 text-right tabular-nums text-neutral-800">
                       <SessionAmount session={open} />
                     </td>
                     <td className="border-b border-neutral-100 px-2 py-2">
                       <SessionRecorder session={open} />
                     </td>
-                    <td className="border-b border-neutral-100 px-2 py-2 text-center">
+                    <td className="border-b border-neutral-100 px-1 py-2 text-center">
                       {open && (
                         <CorrectionControls
                           session={open}
@@ -508,7 +502,7 @@ export function RegisterSessionPanel({
                         />
                       )}
                     </td>
-                    <td className="border-b border-l border-neutral-100 px-2 py-2 text-right tabular-nums text-neutral-700">
+                    <td className="border-b border-l border-neutral-100 px-1 py-2 text-right tabular-nums text-neutral-700">
                       {transactionsLoading
                         ? "…"
                         : transactionsError ||
@@ -516,21 +510,21 @@ export function RegisterSessionPanel({
                           ? "—"
                           : formatYen(receiptSales ?? 0)}
                     </td>
-                    <td className="border-b border-neutral-100 px-2 py-2 text-right font-semibold tabular-nums text-neutral-900">
+                    <td className="border-b border-neutral-100 px-1 py-2 text-right font-semibold tabular-nums text-neutral-900">
                       {cashIncrease === null
                         ? "—"
                         : formatYen(cashIncrease)}
                     </td>
-                    <td className="border-b border-neutral-100 px-2 py-2 text-right tabular-nums">
+                    <td className="border-b border-neutral-100 px-1 py-2 text-right tabular-nums">
                       <DifferenceBadge value={difference} />
                     </td>
-                    <td className="border-b border-l border-neutral-100 px-2 py-2 text-right tabular-nums text-neutral-800">
+                    <td className="border-b border-l border-neutral-100 px-1 py-2 text-right tabular-nums text-neutral-800">
                       <SessionAmount session={close} />
                     </td>
                     <td className="border-b border-neutral-100 px-2 py-2">
                       <SessionRecorder session={close} />
                     </td>
-                    <td className="border-b border-neutral-100 px-2 py-2 text-center">
+                    <td className="border-b border-neutral-100 px-1 py-2 text-center">
                       {close && (
                         <CorrectionControls
                           session={close}
@@ -570,47 +564,57 @@ function SessionAmount({ session }: { session: RegisterSession | null }) {
   return (
     <span className="whitespace-nowrap">
       {formatYen(session.totalAmount)}
-      {session.revisions && session.revisions.length > 0 && (
-        <span className="ml-1 text-[10px] text-amber-600">訂正あり</span>
-      )}
     </span>
   );
 }
 
 function SessionRecorder({ session }: { session: RegisterSession | null }) {
+  const [historyExpanded, setHistoryExpanded] = useState(false);
   if (!session) {
     return <span className="text-neutral-400">—</span>;
   }
+  const revisions = session.revisions ?? [];
+  const latestStaffName = session.updatedByStaffName ?? session.staffName;
+  const latestRecordedAt = session.updatedAt ?? session.createdAt;
+
   return (
     <div className="space-y-0.5 text-neutral-500">
       <p
-        title={`${session.staffName} ${formatTime(session.createdAt)}`}
+        title={`${latestStaffName} ${monthDayTime(latestRecordedAt)}`}
         className="truncate whitespace-nowrap"
       >
-        {session.staffName} {formatTime(session.createdAt)}
+        {latestStaffName} {monthDayTime(latestRecordedAt)}
       </p>
-      {session.updatedAt && session.updatedByStaffName && (
-        <p className="text-amber-600">
-          訂正 {session.updatedByStaffName} {formatTime(session.updatedAt)}
-        </p>
-      )}
-      {session.revisions && session.revisions.length > 0 && (
-        <details className="whitespace-normal">
-          <summary className="cursor-pointer text-neutral-500 underline">
-            訂正履歴 {session.revisions.length}件
-          </summary>
-          <ul className="mt-1 space-y-1">
-            {session.revisions.map((revision, index) => (
-              <li key={`${revision.revisedAt}-${index}`}>
-                {formatYen(revision.totalAmount)} — {revision.staffName}{" "}
-                {formatTime(revision.recordedAt)}
-                <br />
-                訂正 {revision.revisedByStaffName}{" "}
-                {formatTime(revision.revisedAt)}
-              </li>
-            ))}
-          </ul>
-        </details>
+      {revisions.length > 0 && (
+        <>
+          <button
+            type="button"
+            className="inline-flex items-center gap-1 text-neutral-500 hover:text-neutral-900"
+            aria-expanded={historyExpanded}
+            aria-controls={`session-revisions-${session.id}`}
+            onClick={() => setHistoryExpanded((expanded) => !expanded)}
+          >
+            訂正履歴 {revisions.length}件
+            <DownOutlined
+              className={`text-[9px] transition-transform ${
+                historyExpanded ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+          {historyExpanded && (
+            <ul
+              id={`session-revisions-${session.id}`}
+              className="space-y-1 whitespace-nowrap"
+            >
+              {[...revisions].reverse().map((revision, index) => (
+                <li key={`${revision.revisedAt}-${index}`}>
+                  {revision.staffName} {monthDayTime(revision.recordedAt)}{" "}
+                  {formatYen(revision.totalAmount)}
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
       )}
     </div>
   );
@@ -627,9 +631,11 @@ function CorrectionControls({
     <button
       type="button"
       onClick={() => onCorrect(session)}
-      className="whitespace-nowrap text-xs underline hover:text-neutral-900"
+      className="whitespace-nowrap text-xs text-neutral-500 underline hover:text-neutral-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900"
+      aria-label="金額を訂正"
+      title="金額を訂正"
     >
-      金額を訂正
+      訂正
     </button>
   );
 }
@@ -655,6 +661,11 @@ function DifferenceBadge({ value }: { value: number | null }) {
 function monthDay(date: string): string {
   const [, month, day] = date.split("-");
   return `${Number(month)}/${Number(day)}`;
+}
+
+function monthDayTime(epochMs: number): string {
+  const date = new Date(epochMs);
+  return `${date.getMonth() + 1}/${date.getDate()} ${formatTime(epochMs)}`;
 }
 
 function buildDateRange(startDate: string, endDate: string): string[] {
