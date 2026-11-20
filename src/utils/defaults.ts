@@ -14,6 +14,7 @@ export const defaultYearSettings: YearSettings = {
 export const defaultFeeItems = [
   { label: '大人', unitPrice: 500, unit: '人', order: 0 },
   { label: '学生', unitPrice: 500, unit: '人', order: 1 },
+  { label: '子ども（小学生以下）', unitPrice: 500, unit: '人', order: 2 },
 ]
 
 export const defaultProducts = [
