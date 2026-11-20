@@ -138,7 +138,7 @@ export function RegisterTab({
   // グループ料金のみの入力では確定できない（入場料項目か物販が1件以上必要）
   const canConfirm =
     feeLines.some((l) => l.qty > 0) || productLines.some((l) => l.qty > 0);
-  const canSubmit = canConfirm && staffListReady && staff !== null;
+  const canSubmit = canConfirm && staffListReady;
 
   const resetForm = () => {
     setFeeCounts({});
@@ -178,7 +178,9 @@ export function RegisterTab({
       return;
     }
     if (!staff) {
-      setAlertMessage("スタッフを選択してください");
+      setAlertMessage(
+        "担当者が選択されていません。画面右上から担当者を選択してください。",
+      );
       return;
     }
     try {
